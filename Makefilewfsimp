@@ -1,0 +1,31 @@
+ROOTCFLAGS    = $(shell $(ROOTSYS)/bin/root-config --cflags)
+ROOTLIBS      = $(shell $(ROOTSYS)/bin/root-config --libs)
+ROOTGLIBS     = $(shell $(ROOTSYS)/bin/root-config --glibs)
+
+CXX  = g++
+CXX += -I./	
+CXX += -I./obj/
+
+CXXFLAGS  = -g -Wall -fPIC -Wno-deprecated
+CXXFLAGS += $(ROOTCFLAGS)
+
+OUTLIB = ./obj/
+
+#----------------------------------------------------#
+
+all: runwfsimp	
+
+runwfsimp: runwfsimp.cpp src/rootFileStr.hh obj/wfsimp.o obj/wfsimpbase.o
+	$(CXX) -o runwfsimp runwfsimp.cpp $(OUTLIB)*.o $(ROOTCFLAGS) $(ROOTLIBS) $(ROOTGLIBS)
+
+obj/wfsimp.o: src/wfsimp.cpp src/wfsimp.hh obj/wfsimpbase.o
+	$(CXX) $(CXXFLAGS) -c -I. -o $(OUTLIB)wfsimp.o $<
+
+obj/wfsimpbase.o: src/wfsimpbase.cpp src/wfsimpbase.hh
+	$(CXX) $(CXXFLAGS) -c -I. -o $(OUTLIB)wfsimpbase.o $<
+
+clean:
+	rm -f runwfsimp
+	rm -f *~
+	rm -f src/*~
+	rm -f $(OUTLIB)*.o
